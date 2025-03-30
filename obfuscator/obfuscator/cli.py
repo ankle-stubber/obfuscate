@@ -33,7 +33,17 @@ def interactive_anonymize(anonymizer: DataAnonymizer):
     """Run interactive anonymize command."""
     input_file = prompt_for_input("Enter the input CSV file path")
     output_file = prompt_for_input("Enter the output CSV file path")
-    mapping_file = prompt_for_input("Enter the mapping file path (press Enter to use default)", required=False)
+    
+    # Create parent directory for output file if it doesn't exist
+    output_dir = os.path.dirname(output_file)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        
+    # For mapping file, suggest a default path rather than empty string
+    default_mapping_path = f"{os.path.splitext(output_file)[0]}_mapping.pkl"
+    mapping_prompt = f"Enter the mapping file path (press Enter for {default_mapping_path})"
+    mapping_file = prompt_for_input(mapping_prompt, required=False) or default_mapping_path
+    
     detect_types = prompt_for_input("Auto-detect column types? (y/n, default: y)", required=False).lower() != 'n'
     
     # Ask for column types file
@@ -67,7 +77,19 @@ def interactive_deanonymize(anonymizer: DataAnonymizer):
     """Run interactive deanonymize command."""
     input_file = prompt_for_input("Enter the input anonymized CSV file path")
     output_file = prompt_for_input("Enter the output restored CSV file path")
-    mapping_file = prompt_for_input("Enter the mapping file path")
+    
+    # Create parent directory for output file if it doesn't exist
+    output_dir = os.path.dirname(output_file)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
+    # Suggest a default mapping file based on the input file path
+    default_mapping_path = f"{os.path.splitext(input_file)[0]}_mapping.pkl"
+    if os.path.exists(default_mapping_path):
+        mapping_prompt = f"Enter the mapping file path (press Enter for {default_mapping_path})"
+        mapping_file = prompt_for_input(mapping_prompt, required=False) or default_mapping_path
+    else:
+        mapping_file = prompt_for_input("Enter the mapping file path")
     
     # Ask for column types file
     column_types_file = prompt_for_input("Enter column types JSON file path (press Enter to skip)", required=False)
@@ -99,7 +121,12 @@ def interactive_batch_anonymize(anonymizer: DataAnonymizer):
         os.makedirs(output_dir)
     
     pattern = prompt_for_input("Enter file pattern to match (default: *.csv)", required=False) or "*.csv"
-    mapping_file = prompt_for_input("Enter the mapping file path (press Enter to use default)", required=False)
+    
+    # For mapping file, suggest a default path rather than empty string
+    default_mapping_path = os.path.join(output_dir, "anonymization_mapping.pkl")
+    mapping_prompt = f"Enter the mapping file path (press Enter for {default_mapping_path})"
+    mapping_file = prompt_for_input(mapping_prompt, required=False) or default_mapping_path
+    
     detect_types = prompt_for_input("Auto-detect column types? (y/n, default: y)", required=False).lower() != 'n'
     
     # Ask for column types file
@@ -140,7 +167,14 @@ def interactive_batch_deanonymize(anonymizer: DataAnonymizer):
         os.makedirs(output_dir)
     
     pattern = prompt_for_input("Enter file pattern to match (default: *.csv)", required=False) or "*.csv"
-    mapping_file = prompt_for_input("Enter the mapping file path")
+    
+    # Suggest a default mapping file based on the input directory
+    default_mapping_path = os.path.join(input_dir, "anonymization_mapping.pkl")
+    if os.path.exists(default_mapping_path):
+        mapping_prompt = f"Enter the mapping file path (press Enter for {default_mapping_path})"
+        mapping_file = prompt_for_input(mapping_prompt, required=False) or default_mapping_path
+    else:
+        mapping_file = prompt_for_input("Enter the mapping file path")
     
     # Ask for column types file
     column_types_file = prompt_for_input("Enter column types JSON file path (press Enter to skip)", required=False)

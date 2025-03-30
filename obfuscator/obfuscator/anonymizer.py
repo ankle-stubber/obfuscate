@@ -465,14 +465,14 @@ class DataAnonymizer:
             
             # Save mapping if requested
             if save_mapping:
-                if mapping_file is None:
+                if not mapping_file or mapping_file.strip() == '':
                     # Derive mapping file name from output file
                     mapping_file = f"{os.path.splitext(output_file)[0]}_mapping.pkl"
                 
                 self.save_mappings(mapping_file)
             
             print(f"Anonymized data saved to {output_file}")
-            if save_mapping:
+            if save_mapping and mapping_file:
                 print(f"Mapping saved to {mapping_file}")
         
         except Exception as e:
@@ -557,7 +557,7 @@ class DataAnonymizer:
         
         # Save final mapping if requested
         if save_mapping:
-            if mapping_file is None:
+            if not mapping_file or mapping_file.strip() == '':
                 # Derive mapping file name from output directory
                 mapping_file = os.path.join(output_dir, "anonymization_mapping.pkl")
             
